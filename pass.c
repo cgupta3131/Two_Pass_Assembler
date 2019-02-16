@@ -7,7 +7,8 @@
 /*
 	Things to be done
 	1) Whitespaces bakchodi (DONE) //Double check from Lavish
-	2) H and D and B
+	2) H and D and B (DONE)
+	3) Comments (DONE)
 */
 int global_address = 0;
 struct instruction{
@@ -197,11 +198,35 @@ char *decToBin_16(int n)
     return BinDeciNum;
 }
 
+char *binToBin_16(char *input_str)
+{
+
+	input_str[strlen(input_str)-1] = '\0';
+	char *Bin = (char *)malloc(18*sizeof(char));
+    for(int i=0;i<=16;i++)
+    	Bin[i] = '0';
+    Bin[17] = '\0'; 
+
+    int idx = 16;
+    for(int i=strlen(input_str)-1;i>=0;i--)
+    {
+    	if(idx > 8)
+			Bin[idx] = input_str[i];
+		else
+			Bin[idx-1] = input_str[i];
+		idx--; 
+    }
+
+    Bin[8] = ' ';
+
+    return Bin;
+
+}
+
 int strToDec(char *decstring)
 {
 	int value = 0; //to be returned
 	decstring[strlen(decstring) - 1] = '\0';
-	//07898D or 0123D
 
 	if(strlen(decstring) == 4)
 	{	
@@ -223,6 +248,57 @@ int strToDec(char *decstring)
 
 }  
 
+
+void value_to_memory(char *input_str)
+{
+	char *address;
+	if(input_str[strlen(input_str)-1] == 'H') //for hexadecimal types
+	{
+		input_str[5] = '\0';
+		if(input_str[4] == 'H')
+		{
+			address = HexToBin(input_str,0);
+		}
+		else
+			address = HexToBin(input_str,1);
+		printf(" %s " , address);
+	}
+
+	if(input_str[strlen(input_str)-1] == 'D') //for Decimal(Base 10) types
+	{
+		int equ_val = strToDec(input_str);
+		char *address = decToBin_16(equ_val);
+		printf(" %s " , address);
+	}
+
+	if(input_str[strlen(input_str)-1] == 'B') //for Binary input
+	{
+		char *address = binToBin_16(input_str);
+		printf(" %s " , address);
+	}
+
+	return;
+
+}
+
+void register_to_memory(char *input_str)
+{
+	char *address;
+	if(strlen(input_str) == 2)
+	{
+		int num = 0;
+		num += input_str[1]-'0';
+		address = decToBin_5(num);
+	}
+	else
+	{
+		int num = 0;
+		num += input_str[2]-'0';
+		num += 10*(input_str[1]-'0');
+		address = decToBin_5(num);
+	}
+	printf(" %s " , address);
+}
 
 struct instruction *opcodeArray;
 char arr[50][5];
@@ -441,13 +517,14 @@ void pass2(FILE *inputFile)
 	global_address = 0;
 	char s[300];
 	int n=300;
-
+	oksv
 	FILE *Labels = fopen("Symbol.txt", "r");
 	char t[300];
 	int n2 =300;
 
 	int x=1;
 	int start = 0;
+
 	while( fgets(s,n,inputFile) )
 	{	
 
@@ -468,7 +545,6 @@ void pass2(FILE *inputFile)
 		if(flag_white == 0)
 			continue;
 
-
 		int colon_flag = 0;
 		for(int i=0;i<strlen(s);i++)
 		{
@@ -479,6 +555,7 @@ void pass2(FILE *inputFile)
 				s[i] = ' ';
 			
 		}
+
 		int read = 0;
 		int len = strlen(s);
 		char first[100] = {'\0'};
@@ -536,7 +613,7 @@ void pass2(FILE *inputFile)
 						if(strcmp(third, symbol) == 0)
 						{
 							char *third_address;
-							if(address[4] == 'H')
+							if(address[4] == 'H') //Finding his is Symbol table
 							{
 								third_address = HexToBin(address,0);
 							}
@@ -547,8 +624,6 @@ void pass2(FILE *inputFile)
 						}
 					}
 					rewind(Labels);
-					
-					//printf(" %s %s\n" , opcodeArray[i].opcode, third);
 				}
 			}
 			global_address += check4(third); 
@@ -597,49 +672,14 @@ void pass2(FILE *inputFile)
 					printf(" %s 00001 " , opcodeArray[i].opcode);
 
 					if(third[0] == 'R')
-					{
-						char *third_address;
-						if(strlen(third) == 2)
-						{
-							int num = 0;
-							num += third[1]-'0';
-							third_address = decToBin_5(num);
-						}
-						else
-						{
-							int num = 0;
-							num += third[2]-'0';
-							num += 10*(third[1]-'0');
-							third_address = decToBin_5(num);
-						}
-						printf(" %s\n" , third_address);
-
-					}
+						register_to_memory(third);
 					else
-					{
-						if(third[strlen(third)-1] == 'H')
-						{
-							char *third_address;
-							third[5] = '\0';
-							if(third[4] == 'H')
-							{
-								third_address = HexToBin(third,0);
-							}
-							else
-								third_address = HexToBin(third,1);
-							printf(" %s \n" , third_address);
-						}
-
-						if(third[strlen(third)-1] == 'D') //for Decimal(Base 10) types
-						{
-							int equ_val = strToDec(third);
-							char *third_address = decToBin_16(equ_val);
-							printf(" %s \n" , third_address);
-						}
-					}
+						value_to_memory(third);
 				}
 			}
+			printf("\n");
 		}
+
 
 		else //Other cases
 		{
@@ -651,94 +691,19 @@ void pass2(FILE *inputFile)
 					printf(" %s " , opcodeArray[i].opcode);
 
 					if(third[0] == 'R') //If the operand is a register
-					{
-						char *third_address;
-						if(strlen(third) == 2)
-						{
-							int num = 0;
-							num += third[1]-'0';
-							third_address = decToBin_5(num);
-						}
-						else 
-						{
-							int num = 0;
-							num += third[2]-'0';
-							num += 10*(third[1]-'0');
-							third_address = decToBin_5(num);
-						}
-						printf(" %s " , third_address);
-
-					}
+						register_to_memory(third);
 
 					else //If it is given in Bits and bytes
-					{
-						if(third[strlen(third)-1] == 'H')
-						{
-							char *third_address;
-							third[5] = '\0';
-							if(third[4] == 'H')
-							{
-								third_address = HexToBin(third,0);
-							}
-							else
-								third_address = HexToBin(third,1);
-							printf(" %s \n" , third_address);
-						}
-
-						if(third[strlen(third)-1] == 'D') //for Decimal(Base 10) types
-						{
-							int equ_val = strToDec(third);
-							char *third_address = decToBin_16(equ_val);
-							printf(" %s \n" , third_address);
-						}
-
-					}
+						value_to_memory(third);
 
 					if(fourth[0] == 'R') //If second operand is a register
-					{
-						char *fourth_address;
-						if(strlen(fourth) == 2)
-						{
-							int num = 0;
-							num += fourth[1]-'0';
-							fourth_address = decToBin_5(num);
-						}
-						else
-						{
-							int num = 0;
-							num += fourth[2]-'0';
-							num += 10*(fourth[1]-'0');
-							fourth_address = decToBin_5(num);
-						}
-						printf(" %s \n" , fourth_address);
-
-					}
+						register_to_memory(fourth);
 
 					else //else if it is of type bits and bytes
-					{
-						if(fourth[strlen(fourth)-1] == 'H') //for hexadecimal types
-						{
-							char *fourth_address;
-							fourth[5] = '\0';
-							if(fourth[4] == 'H')
-							{
-								fourth_address = HexToBin(fourth,0);
-							}
-							else
-								fourth_address = HexToBin(fourth,1);
-							printf(" %s \n" , fourth_address);
-						}
-
-						if(fourth[strlen(fourth)-1] == 'D') //for Decimal(Base 10) types
-						{
-							int equ_val = strToDec(fourth);
-							char *fourth_address = decToBin_16(equ_val);
-							printf(" %s \n" , fourth_address);
-						}
-
-					}
+						value_to_memory(fourth);
 				}
 			}
+			printf("\n");
 		}
 
 
@@ -782,6 +747,8 @@ void pass2(FILE *inputFile)
 		if(second[0] == 'J' && second[1] == 'N') //Jump if Negative  
 			global_address += check4(third);
 	}
+
+	fclose(Labels);
 
 
 

@@ -170,8 +170,134 @@ char *decToBin_5(int n)
         n = n/2; 
     } 
     return BinDeciNum;
-} 
+}
 
+char *decToBin_16(int n) 
+{    
+    char *BinDeciNum = (char *)malloc(18*sizeof(char));
+    for(int i=0;i<=16;i++)
+    	BinDeciNum[i] = '0';
+    BinDeciNum[17] = '\0'; 
+
+    int i = 16;
+    int idx = i; 
+    while( n!=0 ) 
+    {    
+    	if(i > 8)
+    		idx = i;
+    	else
+    		idx = i-1;
+        int temp  = 0; 
+        temp = n % 2; 
+        BinDeciNum[idx] = temp + 48; 
+        i--; 
+        n = n/2; 
+    } 
+    BinDeciNum[8] = ' ';
+    return BinDeciNum;
+}
+
+char *binToBin_16(char *input_str)
+{
+
+	input_str[strlen(input_str)-1] = '\0';
+	char *Bin = (char *)malloc(18*sizeof(char));
+    for(int i=0;i<=16;i++)
+    	Bin[i] = '0';
+    Bin[17] = '\0'; 
+
+    int idx = 16;
+    for(int i=strlen(input_str)-1;i>=0;i--)
+    {
+    	if(idx > 8)
+			Bin[idx] = input_str[i];
+		else
+			Bin[idx-1] = input_str[i];
+		idx--; 
+    }
+
+    Bin[8] = ' ';
+
+    return Bin;
+
+}
+
+int strToDec(char *decstring)
+{
+	int value = 0; //to be returned
+	decstring[strlen(decstring) - 1] = '\0';
+
+	if(strlen(decstring) == 4)
+	{	
+		value += (decstring[0]-'0')*1000;
+		value += (decstring[1]-'0')*100;
+		value += (decstring[2]-'0')*10;
+		value += (decstring[3]-'0')*1;
+	} 
+
+	else if(strlen(decstring) == 5)
+	{
+		value += (decstring[1]-'0')*1000;
+		value += (decstring[2]-'0')*100;
+		value += (decstring[3]-'0')*10;
+		value += (decstring[4]-'0')*1;
+	}
+
+	return value;
+
+}  
+
+
+void value_to_memory(char *input_str)
+{
+	char *address;
+	if(input_str[strlen(input_str)-1] == 'H') //for hexadecimal types
+	{
+		input_str[5] = '\0';
+		if(input_str[4] == 'H')
+		{
+			address = HexToBin(input_str,0);
+		}
+		else
+			address = HexToBin(input_str,1);
+		printf(" %s " , address);
+	}
+
+	if(input_str[strlen(input_str)-1] == 'D') //for Decimal(Base 10) types
+	{
+		int equ_val = strToDec(input_str);
+		char *address = decToBin_16(equ_val);
+		printf(" %s " , address);
+	}
+
+	if(input_str[strlen(input_str)-1] == 'B') //for Binary input
+	{
+		char *address = binToBin_16(input_str);
+		printf(" %s " , address);
+	}
+
+	return;
+
+}
+
+void register_to_memory(char *input_str)
+{
+	char *address;
+	if(strlen(input_str) == 2)
+	{
+		int num = 0;
+		num += input_str[1]-'0';
+		address = decToBin_5(num);
+	}
+	else
+	{
+		int num = 0;
+		num += input_str[2]-'0';
+		num += 10*(input_str[1]-'0');
+		address = decToBin_5(num);
+	}
+	printf(" %s " , address);
+}
 
 struct instruction *opcodeArray;
 char arr[50][5];
@@ -253,12 +379,15 @@ void pass1(FILE *inputFile)
 		int flag_white = 0;
 		while(s[ii] != '\0')
 		{
-			int var = isspace(s[ii++]);
+			int var = isspace(s[ii]);
 			if(var == 0) //means that is not a whitespace
 			{
+				if(s[ii] == ';') //means that after alot of spaces we get ;->for comments
+					break;
 				flag_white = 1;
 				break;
 			}
+			ii++;
 		}
 		if(flag_white == 0)
 			continue;
@@ -401,12 +530,15 @@ void pass2(FILE *inputFile)
 		int flag_white = 0;
 		while(s[ii] != '\0')
 		{
-			int var = isspace(s[ii++]);
+			int var = isspace(s[ii]);
 			if(var == 0) //means that is not a whitespace
 			{
+				if(s[ii] == ';') //means that after alot of spaces we get ;->for comments
+					break;
 				flag_white = 1;
 				break;
 			}
+			ii++;
 		}
 		if(flag_white == 0)
 			continue;
@@ -421,6 +553,7 @@ void pass2(FILE *inputFile)
 				s[i] = ' ';
 			
 		}
+
 		int read = 0;
 		int len = strlen(s);
 		char first[100] = {'\0'};
@@ -478,7 +611,7 @@ void pass2(FILE *inputFile)
 						if(strcmp(third, symbol) == 0)
 						{
 							char *third_address;
-							if(address[4] == 'H')
+							if(address[4] == 'H') //Finding his is Symbol table
 							{
 								third_address = HexToBin(address,0);
 							}
@@ -539,57 +672,14 @@ void pass2(FILE *inputFile)
 					printf(" %s 00001 " , opcodeArray[i].opcode);
 
 					if(third[0] == 'R')
-					{
-						char *third_address;
-						if(strlen(third) == 2)
-						{
-							int num = 0;
-							num += third[1]-'0';
-							third_address = decToBin_5(num);
-						}
-						else
-						{
-							int num = 0;
-							num += third[2]-'0';
-							num += 10*(third[1]-'0');
-							third_address = decToBin_5(num);
-						}
-						printf(" %s " , third_address);
-
-					}
+						register_to_memory(third);
 					else
-					{
-						printf(" %s " , third);
-					}
-
-					if(fourth[0] == 'R')
-					{
-						char *fourth_address;
-						if(strlen(fourth) == 2)
-						{
-							int num = 0;
-							num += fourth[1]-'0';
-							fourth_address = decToBin_5(num);
-						}
-						else
-						{
-							int num = 0;
-							num += fourth[2]-'0';
-							num += 10*(fourth[1]-'0');
-							fourth_address = decToBin_5(num);
-						}
-						printf(" %s \n" , fourth_address);
-
-					}
-
-					else
-					{
-						printf(" %s\n" , fourth);
-						
-					}
+						value_to_memory(third);
 				}
 			}
+			printf("\n");
 		}
+
 
 		else //Other cases
 		{
@@ -601,80 +691,19 @@ void pass2(FILE *inputFile)
 					printf(" %s " , opcodeArray[i].opcode);
 
 					if(third[0] == 'R') //If the operand is a register
-					{
-						char *third_address;
-						if(strlen(third) == 2)
-						{
-							int num = 0;
-							num += third[1]-'0';
-							third_address = decToBin_5(num);
-						}
-						else 
-						{
-							int num = 0;
-							num += third[2]-'0';
-							num += 10*(third[1]-'0');
-							third_address = decToBin_5(num);
-						}
-						printf(" %s " , third_address);
-
-					}
+						register_to_memory(third);
 
 					else //If it is given in Bits and bytes
-					{
-						if(third[strlen(third)-1] == 'H')
-						{
-							char *third_address;
-							third[5] = '\0';
-							if(third[4] == 'H')
-							{
-								third_address = HexToBin(third,0);
-							}
-							else
-								third_address = HexToBin(third,1);
-							printf(" %s \n" , third_address);
-						}
-
-					}
+						value_to_memory(third);
 
 					if(fourth[0] == 'R') //If second operand is a register
-					{
-						char *fourth_address;
-						if(strlen(fourth) == 2)
-						{
-							int num = 0;
-							num += fourth[1]-'0';
-							fourth_address = decToBin_5(num);
-						}
-						else
-						{
-							int num = 0;
-							num += fourth[2]-'0';
-							num += 10*(fourth[1]-'0');
-							fourth_address = decToBin_5(num);
-						}
-						printf(" %s \n" , fourth_address);
-
-					}
+						register_to_memory(fourth);
 
 					else //else if it is of type bits and bytes
-					{
-						if(fourth[strlen(fourth)-1] == 'H') //for hexadecimal types
-						{
-							char *fourth_address;
-							fourth[5] = '\0';
-							if(fourth[4] == 'H')
-							{
-								fourth_address = HexToBin(fourth,0);
-							}
-							else
-								fourth_address = HexToBin(fourth,1);
-							printf(" %s \n" , fourth_address);
-						}
-
-					}
+						value_to_memory(fourth);
 				}
 			}
+			printf("\n");
 		}
 
 
