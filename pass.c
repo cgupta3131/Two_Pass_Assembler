@@ -2,7 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 
+/*
+	Things to be done
+	2) H and D and B
+*/
 int global_address = 0;
 struct instruction{
     char instr[10];
@@ -10,13 +15,23 @@ struct instruction{
     bool checked2;
 };
 
-/*char* HexToBin(char* hexdec, int idx) 
+void upper_string(char s[]) {
+   int c = 0;
+   
+   while (s[c] != '\0') {
+      if (s[c] >= 'a' && s[c] <= 'z') {
+         s[c] = s[c] - 32;
+      }
+      c++;
+   }
+}
+
+char* HexToBin(char* hexdec, int idx) 
 { 
 	char *hex = (char *)malloc(17*sizeof(char));
 	for(int i=0;i<16;i++)
-		hex[i] = '0';
+		hex[i] = ' ';
 	hex[16] = '\0';
-	printf("%s ", hexdec);
 
 	int j = idx; 
     int i = 0;
@@ -25,92 +40,76 @@ struct instruction{
     { 
     	if(i == 4)
     		break;
-
     	if(hexdec[j] == '0')
+    	{
+
     		hex[i*4+0] = '0';hex[i*4+1] = '0';hex[i*4+2] = '0';hex[i*4+3] = '0';
-    	else if(hexdec[j] == '1')
+    	}
+    	if(hexdec[j] == '1')
+    	{
     		hex[i*4+0] = '0';hex[i*4+1] = '0';hex[i*4+2] = '0';hex[i*4+3] = '1';
-    	else if(hexdec[j] == '2')
+    	}
+    	if(hexdec[j] == '2')
+    	{
     		hex[i*4+0] = '0';hex[i*4+1] = '0';hex[i*4+2] = '1';hex[i*4+3] = '0';
-    	else if(hexdec[j] == '3')
+    	}
+    	if(hexdec[j] == '3')
+    	{
     		hex[i*4+0] = '0';hex[i*4+1] = '0';hex[i*4+2] = '1';hex[i*4+3] = '1';
-    	else if(hexdec[j] == '4')
+    	}
+    	if(hexdec[j] == '4')
+    	{
     		hex[i*4+0] = '0';hex[i*4+1] = '1';hex[i*4+2] = '0';hex[i*4+3] = '0';
-    	else if(hexdec[j] == '5')
+    	}
+    	if(hexdec[j] == '5')
+    	{
     		hex[i*4+0] = '0';hex[i*4+1] = '1';hex[i*4+2] = '0';hex[i*4+3] = '1';
+    	}
+    	if(hexdec[j] == '6')
+    	{
+    		hex[i*4+0] = '0';hex[i*4+1] = '1';hex[i*4+2] = '1';hex[i*4+3] = '0';
+    	}
+    	if(hexdec[j] == '7')
+    	{
+    		hex[i*4+0] = '0';hex[i*4+1] = '1';hex[i*4+2] = '1';hex[i*4+3] = '1';
+    	}
+    	if(hexdec[j] == '8')
+    	{
+    		hex[i*4+0] = '1';hex[i*4+1] = '0';hex[i*4+2] = '0';hex[i*4+3] = '0';
+    	}
+    	if(hexdec[j] == '9')
+    	{
+    		hex[i*4+0] = '1';hex[i*4+1] = '0';hex[i*4+2] = '0';hex[i*4+3] = '1';
+    	}
+    	if(hexdec[j] == 'A')
+    	{
+    		hex[i*4+0] = '1';hex[i*4+1] = '0';hex[i*4+2] = '1';hex[i*4+3] = '0';
+    	}
+    	if(hexdec[j] == 'B')
+    	{
+    		hex[i*4+0] = '1';hex[i*4+1] = '0';hex[i*4+2] = '1';hex[i*4+3] = '1';
+    	}
+    	if(hexdec[j] == 'C')
+    	{
+    		hex[i*4+0] = '1';hex[i*4+1] = '1';hex[i*4+2] = '0';hex[i*4+3] = '0';
+    	}
+    	if(hexdec[j] == 'D')
+    	{
+    		hex[i*4+0] = '1';hex[i*4+1] = '1';hex[i*4+2] = '0';hex[i*4+3] = '1';
+    	}
+    	if(hexdec[j] == 'E')
+    	{
+    		hex[i*4+0] = '1';hex[i*4+1] = '1';hex[i*4+2] = '1';hex[i*4+3] = '0';
+    	}
+    	if(hexdec[j] == 'F')
+    	{
+    		hex[i*4+0] = '1';hex[i*4+1] = '1';hex[i*4+2] = '1';hex[i*4+3] = '1';
+    	}
         i++;
         j++; 
     } 
-
     return hex;
-} */
-
-char *func4(char hex[6]){
-    char *bin=(char *)malloc(sizeof(char)*17);
-    for(int i=0; hex[i]!='H'; i++)
-    {
-        switch(hex[i])
-        {
-            case '0':
-                strcat(bin, "0000");
-                break;
-            case '1':
-                strcat(bin, "0001");
-                break;
-            case '2':
-                strcat(bin, "0010");
-                break;
-            case '3':
-                strcat(bin, "0011");
-                break;
-            case '4':
-                strcat(bin, "0100");
-                break;
-            case '5':
-                strcat(bin, "0101");
-                break;
-            case '6':
-                strcat(bin, "0110");
-                break;
-            case '7':
-                strcat(bin, "0111");
-                break;
-            case '8':
-                strcat(bin, "1000");
-                break;
-            case '9':
-                strcat(bin, "1001");
-                break;
-            case 'a':
-            case 'A':
-                strcat(bin, "1010");
-                break;
-            case 'b':
-            case 'B':
-                strcat(bin, "1011");
-                break;
-            case 'c':
-            case 'C':
-                strcat(bin, "1100");
-                break;
-            case 'd':
-            case 'D':
-                strcat(bin, "1101");
-                break;
-            case 'e':
-            case 'E':
-                strcat(bin, "1110");
-                break;
-            case 'f':
-            case 'F':
-                strcat(bin, "1111");
-                break;
-            default:
-                printf("Invalid hexadecimal input.");
-        }
-    }
-    return bin;
-}
+} 
 
 char *decToHexa(int n) 
 {    
@@ -161,6 +160,7 @@ char *decToBin_5(int n)
     } 
     return BinDeciNum;
 } 
+
 
 struct instruction *opcodeArray;
 char arr[50][5];
@@ -259,6 +259,11 @@ void pass1(FILE *inputFile)
 		else
 			read = sscanf(s," %s %s %s ", second, third, fourth);
 
+		upper_string(first);
+		upper_string(second);
+		upper_string(third);
+		upper_string(fourth);
+
 		if(start == 0)
 		{	
 			if( strcmp(second,"START") == 0)
@@ -271,7 +276,9 @@ void pass1(FILE *inputFile)
 
 		if(colon_flag == 1) //this means there is a label and I need to print the address
 		{
-			printf("%s %d\n", first, global_address );
+			char *dec = decToHexa(global_address);
+			printf("%s %sH\n", first, dec);
+			fprintf(outputSymbol, "%s %sH\n", first, dec);
 		}
 
 		if(second[0] == 'L' && second[1] == 'O' && second[2] == 'O')
@@ -355,6 +362,10 @@ void pass2(FILE *inputFile)
 	char s[300];
 	int n=300;
 
+	FILE *Labels = fopen("Symbol.txt", "r");
+	char t[300];
+	int n2 =300;
+
 	int x=1;
 	int start = 0;
 	while( fgets(s,n,inputFile) )
@@ -381,6 +392,11 @@ void pass2(FILE *inputFile)
 		else
 			read = sscanf(s," %s %s %s ", second, third, fourth);
 
+		upper_string(first);
+		upper_string(second);
+		upper_string(third);
+		upper_string(fourth);
+		
 		if(start == 0)
 		{	
 			if( strcmp(second,"START") == 0)
@@ -400,16 +416,41 @@ void pass2(FILE *inputFile)
 			for(int i=0;i<12;i++)
 			{
 				if( strcmp(opcodeArray[i].instr,"SUB") == 0)
-					printf(" %s 11111 0001H\n" , opcodeArray[i].opcode);
+					printf(" %s 11111  0000000000000001\n" , opcodeArray[i].opcode);
 			}
 			global_address += 4; 
 
 			memeory_address = decToHexa(global_address);
 			printf("%d %s", global_address, memeory_address);
+
 			for(int i=0;i<12;i++)
 			{
 				if( strcmp(opcodeArray[i].instr,"JNZ") == 0 )
-					printf(" %s %s\n" , opcodeArray[i].opcode, third);
+				{
+					while( fgets(t,n2,Labels) )
+					{
+
+						char symbol[100] = {'\0'};
+						char address[100] = {'\0'};
+						sscanf(t," %s %s ", symbol, address);
+
+						if(strcmp(third, symbol) == 0)
+						{
+							char *third_address;
+							if(address[4] == 'H')
+							{
+								third_address = HexToBin(address,0);
+							}
+							else
+								third_address = HexToBin(address,1);
+							printf(" %s %s\n" , opcodeArray[i].opcode, third_address);
+
+						}
+					}
+					rewind(Labels);
+					
+					//printf(" %s %s\n" , opcodeArray[i].opcode, third);
+				}
 			}
 			global_address += check4(third); 
 			continue;
@@ -421,7 +462,29 @@ void pass2(FILE *inputFile)
 			for(int i=0;i<12;i++)
 			{
 				if( strcmp(opcodeArray[i].instr,second) == 0)
-					printf(" %s %s %s\n" , opcodeArray[i].opcode, third, fourth);
+				{
+					while( fgets(t,n2,Labels) )
+					{
+
+						char symbol[100] = {'\0'};
+						char address[100] = {'\0'};
+						sscanf(t," %s %s ", symbol, address);
+
+						if(strcmp(third, symbol) == 0)
+						{
+							char *third_address;
+							if(address[4] == 'H')
+							{
+								third_address = HexToBin(address,0);
+							}
+							else
+								third_address = HexToBin(address,1);
+							printf(" %s %s\n" , opcodeArray[i].opcode, third_address);
+
+						}
+					}
+					rewind(Labels);
+				}
 			}
 		}
 
@@ -481,10 +544,8 @@ void pass2(FILE *inputFile)
 					else
 					{
 						printf(" %s\n" , fourth);
-						//fourth_address = fourth;
 						
 					}
-					//printf(" %s %s\n" , third_address, fourth_address);
 				}
 			}
 		}
@@ -518,19 +579,19 @@ void pass2(FILE *inputFile)
 
 					}
 					else 
-					{/*
-						if(third[0] == '0')
+					{
+						if(fourth[0] == '0')
 						{
-							char *third_address;
-							third[5] = '\0';
-							printf(" JMD%s\n", third );
-							if(third[4] == 'H')
-								third_address = HexToBin(third,0);
+							char *fourth_address;
+							fourth[5] = '\0';
+							if(fourth[4] == 'H')
+							{
+								fourth_address = HexToBin(fourth,0);
+							}
 							else
-								third_address = HexToBin(third,1);
-						}*/
-						//third_address = third;
-						//printf(" %s " , third_address);
+								fourth_address = HexToBin(fourth,1);
+							printf(" %s \n" , fourth_address);
+						}
 
 					}
 
@@ -560,13 +621,12 @@ void pass2(FILE *inputFile)
 						{
 							char *fourth_address;
 							fourth[5] = '\0';
-							printf(" ----- ");
 							if(fourth[4] == 'H')
 							{
-								fourth_address = func4(fourth);
+								fourth_address = HexToBin(fourth,0);
 							}
-							/*else
-								fourth_address = HexToBin(fourth,1);*/
+							else
+								fourth_address = HexToBin(fourth,1);
 							printf(" %s \n" , fourth_address);
 						}
 						
