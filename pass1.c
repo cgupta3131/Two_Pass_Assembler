@@ -6,6 +6,7 @@
 
 /*
 	Things to be done
+	1) Whitespaces bakchodi (DONE) //Double check from Lavish
 	2) H and D and B
 */
 int global_address = 0;
@@ -28,82 +29,92 @@ void upper_string(char s[]) {
 
 char* HexToBin(char* hexdec, int idx) 
 { 
-	char *hex = (char *)malloc(17*sizeof(char));
-	for(int i=0;i<16;i++)
+	char *hex = (char *)malloc(18*sizeof(char));
+	for(int i=0;i<17;i++)
 		hex[i] = ' ';
-	hex[16] = '\0';
+	hex[17] = '\0';
 
 	int j = idx; 
     int i = 0;
-
+    int idx0;
+    int idx1;
+    int idx2;
+    int idx3;
     while(1) 
     { 
+    	idx0 = i*4+0;
+    	idx1 = i*4+1;
+    	idx2 = i*4+2;
+    	idx3 = i*4+3;
+    	if(i == 2 || i == 3)
+    	{
+    		idx0++;idx1++;idx2++;idx3++;
+    	}
     	if(i == 4)
     		break;
     	if(hexdec[j] == '0')
     	{
-
-    		hex[i*4+0] = '0';hex[i*4+1] = '0';hex[i*4+2] = '0';hex[i*4+3] = '0';
+    		hex[idx0] = '0';hex[idx1] = '0';hex[idx2] = '0';hex[idx3] = '0';
     	}
     	if(hexdec[j] == '1')
     	{
-    		hex[i*4+0] = '0';hex[i*4+1] = '0';hex[i*4+2] = '0';hex[i*4+3] = '1';
+    		hex[idx0] = '0';hex[idx1] = '0';hex[idx2] = '0';hex[idx3] = '1';
     	}
     	if(hexdec[j] == '2')
     	{
-    		hex[i*4+0] = '0';hex[i*4+1] = '0';hex[i*4+2] = '1';hex[i*4+3] = '0';
+    		hex[idx0] = '0';hex[idx1] = '0';hex[idx2] = '1';hex[idx3] = '0';
     	}
     	if(hexdec[j] == '3')
     	{
-    		hex[i*4+0] = '0';hex[i*4+1] = '0';hex[i*4+2] = '1';hex[i*4+3] = '1';
+    		hex[idx0] = '0';hex[idx1] = '0';hex[idx2] = '1';hex[idx3] = '1';
     	}
     	if(hexdec[j] == '4')
     	{
-    		hex[i*4+0] = '0';hex[i*4+1] = '1';hex[i*4+2] = '0';hex[i*4+3] = '0';
+    		hex[idx0] = '0';hex[idx1] = '1';hex[idx2] = '0';hex[idx3] = '0';
     	}
     	if(hexdec[j] == '5')
     	{
-    		hex[i*4+0] = '0';hex[i*4+1] = '1';hex[i*4+2] = '0';hex[i*4+3] = '1';
+    		hex[idx0] = '0';hex[idx1] = '1';hex[idx2] = '0';hex[idx3] = '1';
     	}
     	if(hexdec[j] == '6')
     	{
-    		hex[i*4+0] = '0';hex[i*4+1] = '1';hex[i*4+2] = '1';hex[i*4+3] = '0';
+    		hex[idx0] = '0';hex[idx1] = '1';hex[idx2] = '1';hex[idx3] = '0';
     	}
     	if(hexdec[j] == '7')
     	{
-    		hex[i*4+0] = '0';hex[i*4+1] = '1';hex[i*4+2] = '1';hex[i*4+3] = '1';
+    		hex[idx0] = '0';hex[idx1] = '1';hex[idx2] = '1';hex[idx3] = '1';
     	}
     	if(hexdec[j] == '8')
     	{
-    		hex[i*4+0] = '1';hex[i*4+1] = '0';hex[i*4+2] = '0';hex[i*4+3] = '0';
+    		hex[idx0] = '1';hex[idx1] = '0';hex[idx2] = '0';hex[idx3] = '0';
     	}
     	if(hexdec[j] == '9')
     	{
-    		hex[i*4+0] = '1';hex[i*4+1] = '0';hex[i*4+2] = '0';hex[i*4+3] = '1';
+    		hex[idx0] = '1';hex[idx1] = '0';hex[idx2] = '0';hex[idx3] = '1';
     	}
     	if(hexdec[j] == 'A')
     	{
-    		hex[i*4+0] = '1';hex[i*4+1] = '0';hex[i*4+2] = '1';hex[i*4+3] = '0';
+    		hex[idx0] = '1';hex[idx1] = '0';hex[idx2] = '1';hex[idx3] = '0';
     	}
     	if(hexdec[j] == 'B')
     	{
-    		hex[i*4+0] = '1';hex[i*4+1] = '0';hex[i*4+2] = '1';hex[i*4+3] = '1';
+    		hex[idx0] = '1';hex[idx1] = '0';hex[idx2] = '1';hex[idx3] = '1';
     	}
     	if(hexdec[j] == 'C')
     	{
-    		hex[i*4+0] = '1';hex[i*4+1] = '1';hex[i*4+2] = '0';hex[i*4+3] = '0';
+    		hex[idx0] = '1';hex[idx1] = '1';hex[idx2] = '0';hex[idx3] = '0';
     	}
     	if(hexdec[j] == 'D')
     	{
-    		hex[i*4+0] = '1';hex[i*4+1] = '1';hex[i*4+2] = '0';hex[i*4+3] = '1';
+    		hex[idx0] = '1';hex[idx1] = '1';hex[idx2] = '0';hex[idx3] = '1';
     	}
     	if(hexdec[j] == 'E')
     	{
-    		hex[i*4+0] = '1';hex[i*4+1] = '1';hex[i*4+2] = '1';hex[i*4+3] = '0';
+    		hex[idx0] = '1';hex[idx1] = '1';hex[idx2] = '1';hex[idx3] = '0';
     	}
     	if(hexdec[j] == 'F')
     	{
-    		hex[i*4+0] = '1';hex[i*4+1] = '1';hex[i*4+2] = '1';hex[i*4+3] = '1';
+    		hex[idx0] = '1';hex[idx1] = '1';hex[idx2] = '1';hex[idx3] = '1';
     	}
         i++;
         j++; 
@@ -237,6 +248,21 @@ void pass1(FILE *inputFile)
 	int start = 0;
 	while( fgets(s,n,inputFile) )
 	{	
+
+		int ii=0;
+		int flag_white = 0;
+		while(s[ii] != '\0')
+		{
+			int var = isspace(s[ii++]);
+			if(var == 0) //means that is not a whitespace
+			{
+				flag_white = 1;
+				break;
+			}
+		}
+		if(flag_white == 0)
+			continue;
+
 		int colon_flag = 0;
 		for(int i=0;i<strlen(s);i++)
 		{
@@ -370,6 +396,21 @@ void pass2(FILE *inputFile)
 	int start = 0;
 	while( fgets(s,n,inputFile) )
 	{	
+
+		int ii=0;
+		int flag_white = 0;
+		while(s[ii] != '\0')
+		{
+			int var = isspace(s[ii++]);
+			if(var == 0) //means that is not a whitespace
+			{
+				flag_white = 1;
+				break;
+			}
+		}
+		if(flag_white == 0)
+			continue;
+
 		int colon_flag = 0;
 		for(int i=0;i<strlen(s);i++)
 		{
@@ -416,7 +457,7 @@ void pass2(FILE *inputFile)
 			for(int i=0;i<12;i++)
 			{
 				if( strcmp(opcodeArray[i].instr,"SUB") == 0)
-					printf(" %s 11111  0000000000000001\n" , opcodeArray[i].opcode);
+					printf(" %s 11111  00000000 00000001\n" , opcodeArray[i].opcode);
 			}
 			global_address += 4; 
 
@@ -559,7 +600,7 @@ void pass2(FILE *inputFile)
 				{
 					printf(" %s " , opcodeArray[i].opcode);
 
-					if(third[0] == 'R')
+					if(third[0] == 'R') //If the operand is a register
 					{
 						char *third_address;
 						if(strlen(third) == 2)
@@ -578,24 +619,25 @@ void pass2(FILE *inputFile)
 						printf(" %s " , third_address);
 
 					}
-					else 
+
+					else //If it is given in Bits and bytes
 					{
-						if(fourth[0] == '0')
+						if(third[strlen(third)-1] == 'H')
 						{
-							char *fourth_address;
-							fourth[5] = '\0';
-							if(fourth[4] == 'H')
+							char *third_address;
+							third[5] = '\0';
+							if(third[4] == 'H')
 							{
-								fourth_address = HexToBin(fourth,0);
+								third_address = HexToBin(third,0);
 							}
 							else
-								fourth_address = HexToBin(fourth,1);
-							printf(" %s \n" , fourth_address);
+								third_address = HexToBin(third,1);
+							printf(" %s \n" , third_address);
 						}
 
 					}
 
-					if(fourth[0] == 'R')
+					if(fourth[0] == 'R') //If second operand is a register
 					{
 						char *fourth_address;
 						if(strlen(fourth) == 2)
@@ -615,9 +657,9 @@ void pass2(FILE *inputFile)
 
 					}
 
-					else
+					else //else if it is of type bits and bytes
 					{
-						if(fourth[0] == '0')
+						if(fourth[strlen(fourth)-1] == 'H') //for hexadecimal types
 						{
 							char *fourth_address;
 							fourth[5] = '\0';
@@ -629,7 +671,7 @@ void pass2(FILE *inputFile)
 								fourth_address = HexToBin(fourth,1);
 							printf(" %s \n" , fourth_address);
 						}
-						
+
 					}
 				}
 			}
