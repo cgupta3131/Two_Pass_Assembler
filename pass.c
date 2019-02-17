@@ -29,15 +29,31 @@ void upper_string(char s[]) {
    }
 }
 
-char* HexToBin(char* hexdec, int idx) 
+char* HexToBin(char* hexdec) 
 { 
+	int len = strlen(hexdec);
+
+	hexdec[len-1] = '\0'; //Now the string contains 5 or less numbers
+	len = strlen(hexdec);
+	//fprintf(outputMachine, "LENGTH:%d----%s---", len,hexdec );
+	int j =0;
+	int i = 0;
+	if(len == 5)
+		j=1;
+	if(len == 4)
+		j=0;
+	if(len == 3)
+		i=1;
+	if(len == 2)
+		i=2;
+	if(len == 1)
+		i=3;
+
+
 	char *hex = (char *)malloc(18*sizeof(char));
 	for(int i=0;i<17;i++)
-		hex[i] = ' ';
+		hex[i] = '0';
 	hex[17] = '\0';
-
-	int j = idx; 
-    int i = 0;
     int idx0;
     int idx1;
     int idx2;
@@ -121,6 +137,9 @@ char* HexToBin(char* hexdec, int idx)
         i++;
         j++; 
     } 
+
+    hex[8] = ' ';
+    //fprintf(outputMachine, "AAAAAA----%s---AAAAAA", hex );
     return hex;
 } 
 
@@ -225,23 +244,36 @@ char *binToBin_16(char *input_str)
 
 int strToDec(char *decstring)
 {
+
 	int value = 0; //to be returned
 	decstring[strlen(decstring) - 1] = '\0';
-
-	if(strlen(decstring) == 4)
+	if(strlen(decstring) == 5)
 	{	
-		value += (decstring[0]-'0')*1000;
-		value += (decstring[1]-'0')*100;
-		value += (decstring[2]-'0')*10;
-		value += (decstring[3]-'0')*1;
-	} 
-
-	else if(strlen(decstring) == 5)
-	{
 		value += (decstring[1]-'0')*1000;
 		value += (decstring[2]-'0')*100;
 		value += (decstring[3]-'0')*10;
 		value += (decstring[4]-'0')*1;
+
+		
+	} 
+
+	else 
+	{
+		int len = strlen(decstring);
+		len = len-1;
+		int mul = 1;
+		while(len>=0)
+		{	
+			value += (decstring[len]-'0')*mul;
+			//printf("%d\n", value );
+			mul *= 10;
+			len--;
+		}
+
+		/*value += (decstring[0]-'0')*1000;
+		value += (decstring[1]-'0')*100;
+		value += (decstring[2]-'0')*10;
+		value += (decstring[3]-'0')*1;*/
 	}
 
 	return value;
@@ -252,25 +284,26 @@ void value_to_memory(char *input_str)
 {
 	char *address;
 	if(input_str[strlen(input_str)-1] == 'H') //for hexadecimal types
-	{
-		input_str[5] = '\0';
+	{	
+		address = HexToBin(input_str);
+		/*input_str[5] = '\0';
 		if(input_str[4] == 'H')
 		{
 			address = HexToBin(input_str,0);
 		}
 		else
-			address = HexToBin(input_str,1);
+			address = HexToBin(input_str,1);*/
 		fprintf(outputMachine,"%s" , address);
 	}
 
-	if(input_str[strlen(input_str)-1] == 'D') //for Decimal(Base 10) types
+	else if(input_str[strlen(input_str)-1] == 'D') //for Decimal(Base 10) types
 	{
 		int equ_val = strToDec(input_str);
 		char *address = decToBin_16(equ_val);
 		fprintf(outputMachine,"%s" , address);
 	}
 
-	if(input_str[strlen(input_str)-1] == 'B') //for Binary input
+	else if(input_str[strlen(input_str)-1] == 'B') //for Binary input
 	{
 		char *address = binToBin_16(input_str);
 		fprintf(outputMachine,"%s" , address);
@@ -332,7 +365,10 @@ int check1(char a[100], char b[100]) //for MOV, ADD, SUB, AND, OR, CMP
 	if(a[0] != 'R' && b[0] == 'R') //one of them is register
 		return 4; //25;
 	if(a[0] != 'R' && b[0] != 'R') //none of them are registers
+	{
+		//printf("%s %s\n", a, b );
 		return 5; //36
+	}
 }
 
 int check2(char a[100]) //for MUL
@@ -380,7 +416,7 @@ void pass1(FILE *inputFile)
 			int var = isspace(s[ii]);
 			if(var == 0) //means that is not a whitespace
 			{
-				if(s[ii] == ';') //means that after alot of spaces we get ;->for comments
+				if(s[ii] == ';' || s[ii] == '#') //means that after alot of spaces we get ;->for comments
 					break;
 				flag_white = 1;
 				break;
@@ -402,7 +438,7 @@ void pass1(FILE *inputFile)
 		}
 		for(int i=0;i<strlen(s);i++)
 		{
-			if(s[i] == ';')
+			if(s[i] == ';' || s[i] == '#')
 			{
 				s[i] = '\0';
 				break;
@@ -442,9 +478,12 @@ void pass1(FILE *inputFile)
 
 		if(colon_flag == 1) //this means there is a label and I need to print the address
 		{
+			//printf("%d\n", global_address );
 			char *dec = decToHexa(global_address);
 			//printf("%s %sH	\n", first, dec);
 			fprintf(outputSymbol, "%s %sH\n", first, dec);
+			if(read == 1)
+				global_address += 0;	
 		}
 
 		if(second[0] == 'L' && second[1] == 'O' && second[2] == 'O')
@@ -544,7 +583,7 @@ void pass2(FILE *inputFile)
 			int var = isspace(s[ii]);
 			if(var == 0) //means that is not a whitespace
 			{
-				if(s[ii] == ';') //means that after alot of spaces we get ;->for comments
+				if(s[ii] == ';' || s[ii] == '#') //means that after alot of spaces we get ;->for comments
 					break;
 				flag_white = 1;
 				break;
@@ -566,7 +605,7 @@ void pass2(FILE *inputFile)
 
 		for(int i=0;i<strlen(s);i++)
 		{
-			if(s[i] == ';')
+			if(s[i] == ';' || s[i] == '#')
 			{
 				s[i] = '\0';
 				break;
@@ -630,13 +669,15 @@ void pass2(FILE *inputFile)
 						sscanf(t,"%s %s ", symbol, address);
 						if(strcmp(original_third, symbol) == 0)
 						{
-							char *third_address;
-							if(address[4] == 'H') //Finding this is Symbol table
+							//printf("%s ----", address );
+							char *third_address = HexToBin(address);
+							//printf("%s ---", third_address );
+							/*if(address[4] == 'H') //Finding this is Symbol table
 							{
 								third_address = HexToBin(address,0);
 							}
 							else
-								third_address = HexToBin(address,1);
+								third_address = HexToBin(address,1);*/
 							fprintf(outputMachine,"%s %s\n" , opcodeArray[i].opcode, third_address);
 
 						}
@@ -664,13 +705,13 @@ void pass2(FILE *inputFile)
 
 						if(strcmp(original_third, symbol) == 0)
 						{
-							char *third_address;
-							if(address[4] == 'H')
+							char *third_address = HexToBin(address);
+							/*if(address[4] == 'H')
 							{
 								third_address = HexToBin(address,0);
 							}
 							else
-								third_address = HexToBin(address,1);
+								third_address = HexToBin(address,1);*/
 							fprintf(outputMachine,"%s %s\n" , opcodeArray[i].opcode, third_address);
 
 						}
@@ -704,6 +745,13 @@ void pass2(FILE *inputFile)
 
 		else //Other cases
 		{
+			
+			if(read == 1) //means that was just a label
+			{
+				//global_address++;
+				//fprintf(outputMachine,"\n");
+				continue;
+			}
 			fprintf(outputMachine,"%s\t\t", memeory_address);
 			for(int i=0;i<12;i++)
 			{
