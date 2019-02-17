@@ -7,8 +7,10 @@
 /*
 	Things to be done
 	1) Whitespaces bakchodi (DONE) //Double check from Lavish
-	2) H and D and B
+	2) H and D and B (DONE)
+	3) Comments (DONE)
 */
+FILE *outputMachine;
 int global_address = 0;
 struct instruction{
     char instr[10];
@@ -219,7 +221,6 @@ char *binToBin_16(char *input_str)
     Bin[8] = ' ';
 
     return Bin;
-
 }
 
 int strToDec(char *decstring)
@@ -244,7 +245,6 @@ int strToDec(char *decstring)
 	}
 
 	return value;
-
 }  
 
 
@@ -260,24 +260,23 @@ void value_to_memory(char *input_str)
 		}
 		else
 			address = HexToBin(input_str,1);
-		printf(" %s " , address);
+		fprintf(outputMachine,"%s" , address);
 	}
 
 	if(input_str[strlen(input_str)-1] == 'D') //for Decimal(Base 10) types
 	{
 		int equ_val = strToDec(input_str);
 		char *address = decToBin_16(equ_val);
-		printf(" %s " , address);
+		fprintf(outputMachine,"%s" , address);
 	}
 
 	if(input_str[strlen(input_str)-1] == 'B') //for Binary input
 	{
 		char *address = binToBin_16(input_str);
-		printf(" %s " , address);
+		fprintf(outputMachine,"%s" , address);
 	}
 
 	return;
-
 }
 
 void register_to_memory(char *input_str)
@@ -296,7 +295,7 @@ void register_to_memory(char *input_str)
 		num += 10*(input_str[1]-'0');
 		address = decToBin_5(num);
 	}
-	printf(" %s " , address);
+	fprintf(outputMachine,"%s" , address);
 }
 
 struct instruction *opcodeArray;
@@ -362,11 +361,10 @@ int check5() //for HLT
 	return 1; //4
 }	
 
-
 void pass1(FILE *inputFile)
 {
-	FILE *outputOpcode = fopen("Table.txt", "w");
-	FILE *outputSymbol = fopen("Symbol.txt", "w");
+	FILE *outputOpcode = fopen("opTable.txt", "w");
+	FILE *outputSymbol = fopen("symTable.txt", "w");
 	char s[300];
 	int n=300;
 
@@ -402,6 +400,15 @@ void pass1(FILE *inputFile)
 				s[i] = ' ';
 			
 		}
+		for(int i=0;i<strlen(s);i++)
+		{
+			if(s[i] == ';')
+			{
+				s[i] = '\0';
+				break;
+			}
+			
+		}
 		int read = 0;
 		int len = strlen(s);
 		char first[100] = {'\0'};
@@ -412,9 +419,13 @@ void pass1(FILE *inputFile)
 		if(colon_flag == 1)
 			read = sscanf(s," %s %s %s %s ", first, second, third, fourth);
 		else
+		{
 			read = sscanf(s," %s %s %s ", second, third, fourth);
+		}
 
-		upper_string(first);
+		char original_third[100] = {'\0'}; //this might be label also
+		strcpy(original_third,third);	
+		//upper_string(first);
 		upper_string(second);
 		upper_string(third);
 		upper_string(fourth);
@@ -432,7 +443,7 @@ void pass1(FILE *inputFile)
 		if(colon_flag == 1) //this means there is a label and I need to print the address
 		{
 			char *dec = decToHexa(global_address);
-			printf("%s %sH\n", first, dec);
+			//printf("%s %sH	\n", first, dec);
 			fprintf(outputSymbol, "%s %sH\n", first, dec);
 		}
 
@@ -516,13 +527,13 @@ void pass2(FILE *inputFile)
 	global_address = 0;
 	char s[300];
 	int n=300;
-
-	FILE *Labels = fopen("Symbol.txt", "r");
-	char t[300];
+	FILE *Labels = fopen("symTable.txt", "r");
+	outputMachine =fopen("output.o", "w");	char t[300];
 	int n2 =300;
 
 	int x=1;
 	int start = 0;
+
 	while( fgets(s,n,inputFile) )
 	{	
 
@@ -551,6 +562,15 @@ void pass2(FILE *inputFile)
 
 			if(s[i] == ',' || s[i] == ':')
 				s[i] = ' ';
+		}
+
+		for(int i=0;i<strlen(s);i++)
+		{
+			if(s[i] == ';')
+			{
+				s[i] = '\0';
+				break;
+			}
 			
 		}
 
@@ -566,7 +586,9 @@ void pass2(FILE *inputFile)
 		else
 			read = sscanf(s," %s %s %s ", second, third, fourth);
 
-		upper_string(first);
+		//upper_string(first);
+		char original_third[100] = {'\0'}; //this might be label also
+		strcpy(original_third,third);
 		upper_string(second);
 		upper_string(third);
 		upper_string(fourth);
@@ -586,16 +608,16 @@ void pass2(FILE *inputFile)
 
 		if(second[0] == 'L' && second[1] == 'O') //LOOP
 		{
-			printf("%d %s", global_address, memeory_address);
+			fprintf(outputMachine,"%s\t\t", memeory_address);
 			for(int i=0;i<12;i++)
 			{
 				if( strcmp(opcodeArray[i].instr,"SUB") == 0)
-					printf(" %s 11111  00000000 00000001\n" , opcodeArray[i].opcode);
+					fprintf(outputMachine,"%s 11111 00000000 00000001\n" , opcodeArray[i].opcode);
 			}
 			global_address += 4; 
 
 			memeory_address = decToHexa(global_address);
-			printf("%d %s", global_address, memeory_address);
+			fprintf(outputMachine,"%s\t\t", memeory_address);
 
 			for(int i=0;i<12;i++)
 			{
@@ -603,27 +625,23 @@ void pass2(FILE *inputFile)
 				{
 					while( fgets(t,n2,Labels) )
 					{
-
 						char symbol[100] = {'\0'};
 						char address[100] = {'\0'};
-						sscanf(t," %s %s ", symbol, address);
-
-						if(strcmp(third, symbol) == 0)
+						sscanf(t,"%s %s ", symbol, address);
+						if(strcmp(original_third, symbol) == 0)
 						{
 							char *third_address;
-							if(address[4] == 'H') //Finding his is Symbol table
+							if(address[4] == 'H') //Finding this is Symbol table
 							{
 								third_address = HexToBin(address,0);
 							}
 							else
 								third_address = HexToBin(address,1);
-							printf(" %s %s\n" , opcodeArray[i].opcode, third_address);
+							fprintf(outputMachine,"%s %s\n" , opcodeArray[i].opcode, third_address);
 
 						}
 					}
 					rewind(Labels);
-					
-					//printf(" %s %s\n" , opcodeArray[i].opcode, third);
 				}
 			}
 			global_address += check4(third); 
@@ -632,7 +650,7 @@ void pass2(FILE *inputFile)
 
 		else if(second[0] == 'J') //JNZ or JMP
 		{
-			printf("%d %s", global_address, memeory_address);
+			fprintf(outputMachine,"%s\t\t", memeory_address);
 			for(int i=0;i<12;i++)
 			{
 				if( strcmp(opcodeArray[i].instr,second) == 0)
@@ -644,7 +662,7 @@ void pass2(FILE *inputFile)
 						char address[100] = {'\0'};
 						sscanf(t," %s %s ", symbol, address);
 
-						if(strcmp(third, symbol) == 0)
+						if(strcmp(original_third, symbol) == 0)
 						{
 							char *third_address;
 							if(address[4] == 'H')
@@ -653,7 +671,7 @@ void pass2(FILE *inputFile)
 							}
 							else
 								third_address = HexToBin(address,1);
-							printf(" %s %s\n" , opcodeArray[i].opcode, third_address);
+							fprintf(outputMachine,"%s %s\n" , opcodeArray[i].opcode, third_address);
 
 						}
 					}
@@ -664,46 +682,56 @@ void pass2(FILE *inputFile)
 
 		else if(second[0] == 'M' && second[1] == 'U') // Multiplier
 		{
-			printf("%d %s", global_address, memeory_address);
+			fprintf(outputMachine,"%s\t\t", memeory_address);
 			for(int i=0;i<12;i++)
 			{
 				if( strcmp(opcodeArray[i].instr,second) == 0)
 				{
-					printf(" %s 00001 " , opcodeArray[i].opcode);
+					fprintf(outputMachine,"%s 00001 " , opcodeArray[i].opcode);
 
-					if(third[0] == 'R')
-						register_to_memory(third);
-					else
-						value_to_memory(third);
+					if(third[0] != '\0')
+					{
+						if(third[0] == 'R')
+							register_to_memory(third);
+						else
+							value_to_memory(third);
+					}
 				}
 			}
-			printf("\n");
+			fprintf(outputMachine,"\n");
 		}
 
 
 		else //Other cases
 		{
-			printf("%d %s", global_address, memeory_address);
+			fprintf(outputMachine,"%s\t\t", memeory_address);
 			for(int i=0;i<12;i++)
 			{
 				if( strcmp(opcodeArray[i].instr,second) == 0)
 				{
-					printf(" %s " , opcodeArray[i].opcode);
+					fprintf(outputMachine,"%s " , opcodeArray[i].opcode);
 
-					if(third[0] == 'R') //If the operand is a register
-						register_to_memory(third);
+					if(third[0] != '\0')
+					{
+						if(third[0] == 'R') //If the operand is a register
+							register_to_memory(third);
 
-					else //If it is given in Bits and bytes
-						value_to_memory(third);
+						else //If it is given in Bits and bytes
+							value_to_memory(third);
+						fprintf(outputMachine," ");
+					}
 
-					if(fourth[0] == 'R') //If second operand is a register
-						register_to_memory(fourth);
+					if(fourth[0] != '\0')
+					{
+						if(fourth[0] == 'R') //If second operand is a register
+							register_to_memory(fourth);
 
-					else //else if it is of type bits and bytes
-						value_to_memory(fourth);
+						else //else if it is of type bits and bytes
+							value_to_memory(fourth);
+					}
 				}
 			}
-			printf("\n");
+			fprintf(outputMachine,"\n");
 		}
 
 
@@ -748,8 +776,7 @@ void pass2(FILE *inputFile)
 			global_address += check4(third);
 	}
 
-
-
+	fclose(Labels);
 }
 
 int main(){
@@ -763,7 +790,4 @@ int main(){
     pass2(inputFile);
 
     fclose(inputOpcodeFile);
-
-   	
-
 }
