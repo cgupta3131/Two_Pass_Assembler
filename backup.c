@@ -139,6 +139,7 @@ char* HexToBin(char* hexdec)
     } 
 
     hex[8] = ' ';
+    //fprintf(outputMachine, "AAAAAA----%s---AAAAAA", hex );
     return hex;
 } 
 
@@ -295,14 +296,14 @@ void value_to_memory(char *input_str)
 		fprintf(outputMachine,"%s" , address);
 	}
 
-	if(input_str[strlen(input_str)-1] == 'D') //for Decimal(Base 10) types
+	else if(input_str[strlen(input_str)-1] == 'D') //for Decimal(Base 10) types
 	{
 		int equ_val = strToDec(input_str);
 		char *address = decToBin_16(equ_val);
 		fprintf(outputMachine,"%s" , address);
 	}
 
-	if(input_str[strlen(input_str)-1] == 'B') //for Binary input
+	else if(input_str[strlen(input_str)-1] == 'B') //for Binary input
 	{
 		char *address = binToBin_16(input_str);
 		fprintf(outputMachine,"%s" , address);
@@ -641,12 +642,12 @@ void pass2(FILE *inputFile)
 		if(strcmp(second,"END") == 0)
 			break;
 
-		char *memeory_address = decToHexa(global_address);
+		char *memory_address = decToHexa(global_address);
 
 
 		if(second[0] == 'L' && second[1] == 'O') //LOOP
 		{
-			fprintf(outputMachine,"%s\t\t", memeory_address);
+			fprintf(outputMachine,"%s\t\t", memory_address);
 			for(int i=0;i<12;i++)
 			{
 				if( strcmp(opcodeArray[i].instr,"SUB") == 0)
@@ -654,8 +655,8 @@ void pass2(FILE *inputFile)
 			}
 			global_address += 4; 
 
-			memeory_address = decToHexa(global_address);
-			fprintf(outputMachine,"%s\t\t", memeory_address);
+			memory_address = decToHexa(global_address);
+			fprintf(outputMachine,"%s\t\t", memory_address);
 
 			for(int i=0;i<12;i++)
 			{
@@ -690,7 +691,7 @@ void pass2(FILE *inputFile)
 
 		else if(second[0] == 'J') //JNZ or JMP
 		{
-			fprintf(outputMachine,"%s\t\t", memeory_address);
+			fprintf(outputMachine,"%s\t\t", memory_address);
 			for(int i=0;i<12;i++)
 			{
 				if( strcmp(opcodeArray[i].instr,second) == 0)
@@ -722,7 +723,7 @@ void pass2(FILE *inputFile)
 
 		else if(second[0] == 'M' && second[1] == 'U') // Multiplier
 		{
-			fprintf(outputMachine,"%s\t\t", memeory_address);
+			fprintf(outputMachine,"%s\t\t", memory_address);
 			for(int i=0;i<12;i++)
 			{
 				if( strcmp(opcodeArray[i].instr,second) == 0)
@@ -751,7 +752,7 @@ void pass2(FILE *inputFile)
 				//fprintf(outputMachine,"\n");
 				continue;
 			}
-			fprintf(outputMachine,"%s\t\t", memeory_address);
+			fprintf(outputMachine,"%s\t\t", memory_address);
 			for(int i=0;i<12;i++)
 			{
 				if( strcmp(opcodeArray[i].instr,second) == 0)
